@@ -28,20 +28,20 @@
 			return emptyStream();
 		},
 		filter: function(predicate) {
-        	if(this.isEmpty()) {
-	            return this;
-	        }
+			if(this.isEmpty()) {
+				return this;
+			}
 
-	        var head = this.headValue;
-	        var tail = this.tailPromise();
+			var head = this.headValue;
+			var tail = this.tailPromise();
 
-	        if(predicate(head)) {
-	            return new Stream(head, function () {
-	                return tail.filter(predicate);
-	            });
-	        }
-	        return tail.filter(predicate);
-	    },
+			if(predicate(head)) {
+				return new Stream(head, function () {
+					return tail.filter(predicate);
+				});
+			}
+			return tail.filter(predicate);
+		},
 		isEmpty: function() {
 			return this.headValue === undefined;
 		},
