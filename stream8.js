@@ -1,49 +1,43 @@
 (function () {
-	var emptyStream = function() {
-		return new Stream();
-	}
-
-	function Stream(head, tailPromise) {
-	    if (typeof head != 'undefined') {
-	        this.headValue = head;
-	    }
-	    if (typeof tailPromise == 'undefined') {
-	        tailPromise = function () {
-	            return new Stream();
+	function StreamImpl(head, tail) {
+	    if (typeof tail === 'undefined') {
+	        tail = function () {
+	            Stream.empty();
 	        };
 	    }
-	    this.tailPromise = tailPromise;
+		this.head = head;
+	    this.tail = tail;
 	}
 
-	Stream.prototype = {
+	StreamImpl.prototype = {
 		/* Terminal */
 		count: function() {
 			if(this.isEmpty()) {
 				return 0;
 			}
 
-			return this.tailPromise().count() + 1;
+			return this.tail().count() + 1;
 		},
 		empty: function() {
-			return emptyStream();
+			return Stream.empty();
 		},
 		filter: function(predicate) {
 			if(this.isEmpty()) {
 				return this;
 			}
 
-			var head = this.headValue;
-			var tail = this.tailPromise();
+			var head = this.head;
+			var tail = this.tail();
 
 			if(predicate(head)) {
-				return new Stream(head, function () {
+				return new StreamImpl(head, function () {
 					return tail.filter(predicate);
 				});
 			}
 			return tail.filter(predicate);
 		},
 		isEmpty: function() {
-			return this.headValue === undefined;
+			return this.head === undefined;
 		},
 		/* Terminal */
 		forEach: function(consumer, defaultResult, curIndex) {
@@ -55,13 +49,13 @@
 				return defaultResult;
 			}
 
-			var val = consumer(this.headValue, curIndex++);
+			var val = consumer(this.head, curIndex++);
 
 			if(val !== undefined) {
 				return val;
 			}
 
-			var next = this.tailPromise();
+			var next = this.tail();
 
 			if(next !== undefined) {
 				val = next.forEach(consumer, defaultResult, curIndex);
@@ -71,23 +65,23 @@
 		},
 		limit: function(maxElements) {
 			if(this.isEmpty() || maxElements < 1)
-				return emptyStream();
+				return Stream.empty();
 
 			if(maxElements === 0) {
-				return new Stream(this.headValue, function() {
-					return emptyStream();
+				return new StreamImpl(this.head, function() {
+					return Stream.empty();
 				});
 			}
 
-			var next = this.tailPromise();
+			var next = this.tail();
 
 			if(next === undefined) {
-				return new Stream(this.headValue, function() {
-					return emptyStream();
+				return new StreamImpl(this.head, function() {
+					return Stream.empty();
 				});
 			}
 
-			return new Stream(this.headValue, function() {
+			return new StreamImpl(this.head, function() {
 				return next.limit(--maxElements);
 			});
 		},
@@ -116,10 +110,63 @@
 	if(!Array.prototype.stream) {
 		Array.prototype.stream = function() {
 			var self = this;
-			return new Stream(this[0], function() {
+			return new StreamImpl(this[0], function() {
 				var val = self.slice(1);
-				return val === undefined || val.length === 0 ? emptyStream() : val.stream();
+				return val === undefined || val.length === 0 ? Stream.empty() : val.stream();
 			});
 		}
+	}
+
+	var make = function( /* arguments */ ) {
+	    if(arguments.length == 0) {
+	        return Stream.empty();
+	    }
+
+	    var restArguments = Array.prototype.slice.call(arguments, 1);
+
+	    return new StreamImpl(arguments[0], function () {
+	        return make.apply(null, restArguments);
+	    });
+	}
+
+	var Stream = {
+		empty: function() {
+			return new StreamImpl();
+		},
+		generate: function(supplier) {
+			var head = supplier.get();
+
+			if(head === undefined) {
+				return this.empty();
+			}
+
+		    return new StreamImpl(head, function() {
+		    	return Stream.generate(supplier);
+		    });
+		},
+		range: function (low, high) {
+		    if(low === undefined) {
+		        low = 1;
+		    }
+
+			return Stream.generate({
+				low: low,
+		    	high: high,
+		    	get: function () {
+		    		if(this.high !== undefined && this.low > this.high) {
+		    			return undefined;
+		    		}
+
+		    		return this.low++;
+		    	}
+			});
+		}
+	};
+
+	var isCommonJS = typeof module !== 'undefined' && module.exports;
+	if(isCommonJS) {
+		module.exports = Stream;
+	} else {
+		self.Stream = Stream;
 	}
 })();

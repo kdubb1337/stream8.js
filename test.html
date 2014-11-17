@@ -52,6 +52,21 @@
 		.toArray();
 
 	console.log("toArray=" + JSON.stringify(result) + "");
+
+	console.log("Stream.range(0, 10)=" + Stream.range(0, 9).limit(200).toString() + "");
+
+
+	var fibonacci = {
+		beforePrevious: 1,
+    	previous: 0,
+    	get: function () {
+    		var result = this.beforePrevious + this.previous;
+	        this.beforePrevious = this.previous;
+	        this.previous = result;
+	        return result;
+    	}
+	};
+	console.log("fibonacci=" + Stream.generate(fibonacci).limit(20).count());
 	</script>
 </body>
 </html>
