@@ -6,6 +6,7 @@ Map-reduce operations based on <a href="https://docs.oracle.com/javase/8/docs/ap
 <h3>Background</h3>
 Streams are an efficient, functional way to reduce boilerplate code for common array manipulation tasks. You'll start coding less, coding quicker and have code which is not only easier to read, but less prone to errors.
 
+<h3>Getting Started</h3>
 To get started you can include Stream8 with bower using <code>"stream8": "~0.1.1"</code> or you can download the source from the app folder and or the minified version from dist.
 
 Now you're ready to use streams. You can create a stream by using .stream() on an array like so:
