@@ -1,8 +1,8 @@
 (function () {
 	function StreamImpl(head, tail) {
-	    if (typeof tail === 'undefined') {
+	    if(typeof tail == 'undefined') {
 	        tail = function () {
-	            Stream.empty();
+	            return Stream.empty();
 	        };
 	    }
 		this.head = head;
@@ -34,9 +34,7 @@
 			return tail.filter(predicate);
 		},
 		isEmpty: function() {
-			// TODO should improve this to better handle undefined values
-			var next = this.tail();
-			return this.head === undefined && (next === undefined || next.head === undefined);
+			return typeof this.head == 'undefined';
 		},
 		/* Terminal */
 		forEach: function(consumer, defaultResult, curIndex) {
@@ -106,15 +104,17 @@
 	    }
 	};
 
-	if(!Array.prototype.stream) {
-		Array.prototype.stream = function() {
-			var self = this;
-			return new StreamImpl(this[0], function() {
-				var val = self.slice(1);
-				return val === undefined || val.length === 0 ? Stream.empty() : val.stream();
-			});
-		}
+	function ArrayStreamImpl(head, tail) {
+		StreamImpl.call(this, head, tail);
 	}
+
+	// Add StreamImpl methods
+	ArrayStreamImpl.prototype = Object.create(StreamImpl.prototype);
+
+	/*  We will be sure to return a Stream.empty() when the ArrayStream has reached the end.
+	 *  This allows us to safely handle undefines in the ArrayStream, knowing there's more to come
+	 */
+	ArrayStreamImpl.prototype.isEmpty = function() {return false;}
 
 	var Stream = {
 		empty: function() {
@@ -149,6 +149,19 @@
 			});
 		}
 	};
+
+	if(!Array.prototype.stream) {
+		Array.prototype.stream = function() {
+			if(this.length === 0)
+				return Stream.empty();
+
+			var self = this;
+			return new ArrayStreamImpl(this[0], function() {
+				var val = self.slice(1);
+				return val === undefined || val.length === 0 ? Stream.empty() : val.stream();
+			});
+		}
+	}
 
 	var isCommonJS = typeof module !== 'undefined' && module.exports;
 	if(isCommonJS) {

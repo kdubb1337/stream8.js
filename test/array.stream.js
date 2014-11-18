@@ -23,6 +23,8 @@ describe('arrays to streams', function () {
 			return temp.head;
 		};
 
+		expect([].stream().tail).not.toBe(undefined);
+		expect([].stream().tail()).not.toBe(undefined);
 		expect(next([].stream())).toBe(undefined);
 		expect(next([1].stream())).toBe(undefined);
 		
@@ -37,6 +39,7 @@ describe('arrays to streams', function () {
 		expect(next(stream, 2)).toBe("c");
 		expect(next(stream, 3)).toBe("a");
 		expect(next(stream, 4)).toBe(undefined);
+		expect(next(stream, 100)).toBe(undefined);
 
 		expect(next([{}].stream())).toBe(undefined);
 
