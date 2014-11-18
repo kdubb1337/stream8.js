@@ -1,0 +1,19 @@
+{
+  "name": "bootstrap",
+  "description": "The most popular front-end framework for developing responsive, mobile first projects on the web.",
+  "version": "0.1.0",
+  "keywords": [
+    "js",
+    "stream",
+    "streams",
+    "functional"
+  ],
+  "homepage": "https://github.com/kdubb1337/stream8.js",
+  "main": [
+    "app/stream8.js"
+  ],
+  "ignore": [
+  ],
+  "dependencies": {
+  }
+}
