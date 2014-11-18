@@ -9,7 +9,7 @@ module.exports = function(grunt) {
 
     // Configurable paths
     var config = {
-        app: 'app',
+        app: 'src',
         dist: 'dist',
         port: "9000"
     };
@@ -95,7 +95,7 @@ module.exports = function(grunt) {
             ]);
         }
         grunt.task.run([
-            'connect:test',
+            // 'connect:test',
             'karma:unit'
         ]);
     });

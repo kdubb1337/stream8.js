@@ -18,9 +18,6 @@
 
 			return this.tail().count() + 1;
 		},
-		empty: function() {
-			return Stream.empty();
-		},
 		filter: function(predicate) {
 			if(this.isEmpty()) {
 				return this;
@@ -37,7 +34,9 @@
 			return tail.filter(predicate);
 		},
 		isEmpty: function() {
-			return this.head === undefined;
+			// TODO should improve this to better handle undefined values
+			var next = this.tail();
+			return this.head === undefined && (next === undefined || next.head === undefined);
 		},
 		/* Terminal */
 		forEach: function(consumer, defaultResult, curIndex) {

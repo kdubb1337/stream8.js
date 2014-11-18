@@ -22,14 +22,3 @@ require.config({
 	// we have to kickoff jasmine, as it is asynchronous
 	callback: window.__karma__.start
 });
-
-
-describe('arrays to streams', function () {
-	it('can be made and accessess', function () {
-		expect(["c", "b", "c", "a"].stream().count()).toBe(4);
-		expect([].stream().count()).toBe(0);
-		expect([1].stream().count()).toBe(1);
-		expect([{}].stream().count()).toBe(1);
-		expect([{name:"b"}, {name:"a"}].stream().count()).toBe(2);
-	});
-});
