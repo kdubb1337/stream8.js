@@ -117,18 +117,6 @@
 		}
 	}
 
-	var make = function( /* arguments */ ) {
-	    if(arguments.length == 0) {
-	        return Stream.empty();
-	    }
-
-	    var restArguments = Array.prototype.slice.call(arguments, 1);
-
-	    return new StreamImpl(arguments[0], function () {
-	        return make.apply(null, restArguments);
-	    });
-	}
-
 	var Stream = {
 		empty: function() {
 			return new StreamImpl();
