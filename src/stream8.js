@@ -9,6 +9,14 @@
 	    this.tail = tail;
 	}
 
+	var newOfSameType = function(obj, head, tail) {
+		if(typeof obj == 'StreamImpl') {
+			return new StreamImpl(head, tail);
+		}
+
+		return new ArrayStreamImpl(head, tail);
+	};
+
 	StreamImpl.prototype = {
 		/* Terminal */
 		count: function() {
@@ -27,7 +35,7 @@
 			var tail = this.tail();
 
 			if(predicate(head)) {
-				return new StreamImpl(head, function () {
+				return newOfSameType(this, head, function () {
 					return tail.filter(predicate);
 				});
 			}
@@ -65,10 +73,9 @@
 				return Stream.empty();
 
 			var next = this.tail();
-
-			return new StreamImpl(this.head, function() {
+			return newOfSameType(this, this.head, function() {
 				return next.limit(--maxElements);
-			});
+			})
 		},
 		/* Terminal */
 		toArray: function() {
@@ -103,17 +110,6 @@
 	 *  This allows us to safely handle undefines in the ArrayStream, knowing there's more to come
 	 */
 	ArrayStreamImpl.prototype.isEmpty = function() {return false;}
-
-	ArrayStreamImpl.prototype.limit = function(maxElements) {
-		if(maxElements < 1)
-			return Stream.empty();
-
-		var next = this.tail();
-
-		return new ArrayStreamImpl(this.head, function() {
-			return next.limit(--maxElements);
-		});
-	}
 
 	var Stream = {
 		empty: function() {
