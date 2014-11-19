@@ -9,20 +9,6 @@ describe('arrays to streams', function () {
 	});
 
 	it('can be made w/tail', function () {
-		// next function will tidy up the tests so we don't have to keep going stream.tail().tail()... etc
-		var next = function next(stream, depth) {
-			if(depth === undefined)
-				return stream.tail().head;
-
-			var temp = stream;
-
-			for(var i = 0; i < depth; i++) {
-				temp = temp.tail();
-			}
-
-			return temp.head;
-		};
-
 		expect([].stream().tail).not.toBe(undefined);
 		expect([].stream().tail()).not.toBe(undefined);
 		expect(next([].stream())).toBe(undefined);

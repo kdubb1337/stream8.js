@@ -22,3 +22,17 @@ require.config({
 	// we have to kickoff jasmine, as it is asynchronous
 	callback: window.__karma__.start
 });
+
+// next function will tidy up the tests so we don't have to keep going stream.tail().tail()... etc
+var next = function next(stream, depth) {
+	if(depth === undefined)
+		return stream.tail().head;
+
+	var temp = stream;
+
+	for(var i = 0; i < depth; i++) {
+		temp = temp.tail();
+	}
+
+	return temp.head;
+};
