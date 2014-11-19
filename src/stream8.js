@@ -61,22 +61,10 @@
 			return val ? val : defaultResult;
 		},
 		limit: function(maxElements) {
-			if(this.isEmpty() || maxElements < 1)
+			if(maxElements < 1 || this.isEmpty())
 				return Stream.empty();
 
-			if(maxElements === 0) {
-				return new StreamImpl(this.head, function() {
-					return Stream.empty();
-				});
-			}
-
 			var next = this.tail();
-
-			if(next === undefined) {
-				return new StreamImpl(this.head, function() {
-					return Stream.empty();
-				});
-			}
 
 			return new StreamImpl(this.head, function() {
 				return next.limit(--maxElements);
@@ -115,6 +103,17 @@
 	 *  This allows us to safely handle undefines in the ArrayStream, knowing there's more to come
 	 */
 	ArrayStreamImpl.prototype.isEmpty = function() {return false;}
+
+	ArrayStreamImpl.prototype.limit = function(maxElements) {
+		if(maxElements < 1)
+			return Stream.empty();
+
+		var next = this.tail();
+
+		return new ArrayStreamImpl(this.head, function() {
+			return next.limit(--maxElements);
+		});
+	}
 
 	var Stream = {
 		empty: function() {
