@@ -26,6 +26,9 @@
 
 			return this.tail().count() + 1;
 		},
+		isEmpty: function() {
+			return typeof this.head == 'undefined';
+		},
 		filter: function(predicate) {
 			if(this.isEmpty()) {
 				return this;
@@ -40,9 +43,6 @@
 				});
 			}
 			return tail.filter(predicate);
-		},
-		isEmpty: function() {
-			return typeof this.head == 'undefined';
 		},
 		/* Terminal */
 		forEach: function(consumer, defaultResult, curIndex) {

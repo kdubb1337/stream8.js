@@ -23,6 +23,81 @@ describe('A Stream', function () {
 		expect([].stream().isEmpty()).toBe(true);
 	});
 
+	it('can filter elements', function () {
+		var filtered = ["b", "c", "a", "c"].stream().filter(function(val) {
+			return val != "c";
+		});
+		expect(filtered.count()).toBe(2);
+		expect(filtered.toArray()).toEqual(["b", "a"]);
+
+		filtered = Stream.empty().filter(function(val) {
+			return val != "c";
+		});
+		expect(filtered.count()).toBe(0);
+		expect(filtered.toArray()).toEqual([]);
+
+		filtered = [{name:"bob"}, {name:"alice"}, {name:"vivian"},{firstName:"alice"}]
+			.stream()
+			.filter(function(val) {
+				return val.name == "alice" || val.firstName == "alice";
+			});
+		expect(filtered.count()).toBe(2);
+		expect(filtered.toArray()).toEqual([{name:"alice"}, {firstName:"alice"}]);
+
+		filtered = Stream.range(100)
+			.filter(function(val) {
+				return val > 150;
+			})
+			.limit(100);
+		expect(filtered.toArray()).toEqual(Stream.range(151, 250).toArray());
+	});
+
+	it('can run a function for each element', function () {
+		var counter = 0;
+		var lastElement;
+		["a", "b", "c"].stream().forEach(function(val) {
+			counter++;
+			lastElement = val;
+		});
+		expect(counter).toBe(3);
+		expect(lastElement).toBe("c");
+
+		counter = 0;
+		lastElement = "notThis!";
+		[undefined].stream().forEach(function(val) {
+			counter++;
+			lastElement = val;
+		});
+		expect(counter).toBe(1);
+		expect(lastElement).toBe(undefined);
+
+		counter = 0;
+		lastElement = "this!";
+		[].stream().forEach(function(val) {
+			counter++;
+			lastElement = val;
+		});
+		expect(counter).toBe(0);
+		expect(lastElement).toBe("this!");
+
+		counter = 0;
+		lastElement = "this!";
+		Stream.empty().forEach(function(val) {
+			counter++;
+			lastElement = val;
+		});
+		expect(counter).toBe(0);
+		expect(lastElement).toBe("this!");
+
+		counter = 0;
+		Stream.range().limit(1000).forEach(function(val) {
+			counter++;
+			lastElement = val;
+		});
+		expect(counter).toBe(1000);
+		expect(lastElement).toBe(1000);
+	});
+
 	it('can limit', function() {
 		expect([].stream().limit(0).count()).toBe(0);
 		expect([].stream().limit(2).count()).toBe(0);
@@ -41,5 +116,19 @@ describe('A Stream', function () {
 		expect(Stream.range(0, 100).limit(22).count()).toBe(22);
 		expect(Stream.range(0, 100).limit(5).toArray()).toEqual([0, 1, 2, 3, 4]);
 		expect(Stream.range().limit(512).count()).toBe(512);
+	});
+
+	it('can be made into an array', function () {
+		expect([].stream().toArray()).toEqual([]);
+		expect(["1", 1 , "a", undefined, "basdf"].stream().toArray())
+			.toEqual(["1", 1 , "a", undefined, "basdf"]);
+		expect([undefined].stream().toArray()).toEqual([undefined]);
+		expect([undefined, undefined, NaN, null].stream().toArray())
+			.toEqual([undefined, undefined, NaN, null]);
+
+		expect(Stream.range(0, 5).toArray()).toEqual([0, 1, 2, 3, 4, 5]);
+		expect(Stream.range(-2, -1).toArray()).toEqual([-2, -1]);
+		expect(Stream.range(1, -1).toArray()).toEqual([]);
+		expect(Stream.range(1).limit(5).toArray()).toEqual([1, 2, 3, 4, 5]);
 	});
 });
