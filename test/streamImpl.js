@@ -1,4 +1,16 @@
 describe('A Stream', function () {
+	it('can be averaged', function () {
+		expect([].stream().average()).toBe(0);
+		expect([undefined, NaN, null, 0].stream().average()).toBe(0);
+		expect([1].stream().average()).toBe(1);
+		expect([-5, 5].stream().average()).toBe(0);
+		expect([1, 2, 3, 4, 5].stream().average()).toBe(3);
+		expect([1, 2].stream().average()).toBe(1.5);
+
+		expect(Stream.empty().average()).toBe(0);
+		expect(Stream.range(0,1000).average()).toBe(500);
+	});
+
 	it('can be counted', function () {
 		expect([].stream().count()).toBe(0);
 		expect([1].stream().count()).toBe(1);
@@ -130,5 +142,20 @@ describe('A Stream', function () {
 		expect(Stream.range(-2, -1).toArray()).toEqual([-2, -1]);
 		expect(Stream.range(1, -1).toArray()).toEqual([]);
 		expect(Stream.range(1).limit(5).toArray()).toEqual([1, 2, 3, 4, 5]);
+	});
+
+	it('can sum the elements', function () {
+		expect([].stream().sum()).toBe(0);
+		expect([-1, 1].stream().sum()).toBe(0);
+		expect([1, 2, 3].stream().sum()).toBe(6);
+		expect([3, -3, 100].stream().sum()).toBe(100);
+		expect(Stream.empty().sum()).toBe(0);
+		expect(Stream.range(0, 10).sum()).toBe(55);
+
+		expect([undefined, NaN].stream().sum()).toBe(0);
+		expect([5, undefined, 9995, 22].stream().sum()).toBe(10022);
+
+		expect([{}, "a"].stream().sum()).toBe(0);
+		expect([NaN, null, {}, 2, "a"].stream().sum()).toBe(2);
 	});
 });

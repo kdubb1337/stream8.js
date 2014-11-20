@@ -17,8 +17,24 @@
 		return new ArrayStreamImpl(head, tail);
 	};
 
+	var isValidNumber = function(val) {
+		return typeof val == 'number' && !isNaN(val);
+	}
+
 	StreamImpl.prototype = {
-		/* Terminal */
+		average: function() {
+			var count = 0;
+			var total = 0;
+
+			this.forEach(function(val) {
+				if(isValidNumber(val)) {
+					count++;
+					total += val;
+				}
+			});
+
+			return count === 0 ? 0 : total / count;
+		},
 		count: function() {
 			if(this.isEmpty()) {
 				return 0;
@@ -96,7 +112,14 @@
 			});
 
 			return result + "}]";
-	    }
+	    },
+		sum: function() {
+			if(this.isEmpty())
+				return 0;
+
+			return isValidNumber(this.head) ? this.head + this.tail().sum() :
+				this.tail().sum();
+		}
 	};
 
 	function ArrayStreamImpl(head, tail) {
