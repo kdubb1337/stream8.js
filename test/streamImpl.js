@@ -130,6 +130,52 @@ describe('A Stream', function () {
 		expect(Stream.range().limit(512).count()).toBe(512);
 	});
 
+	it('can map to a new stream', function() {
+		var mapper = function(val) {
+			if(val === undefined) {
+				return undefined;
+			}
+			return val.salary;
+		};
+
+		expect([].stream().map(mapper).count()).toBe(0);
+		expect([].stream().map(mapper).isEmpty()).toBe(true);
+		expect([undefined].stream().map(mapper).count()).toEqual(1);
+		expect([undefined].stream().map(mapper).isEmpty()).toBe(false);
+		expect([{salary:5}, {salary:46}].stream().map(mapper).count()).toBe(2);
+		expect([{salary:5}, {salary:46}].stream().map(mapper).sum()).toBe(51);
+		expect([{salary:5}, {salary:46}].stream().map(mapper).average()).toBe(25.5);
+
+		expect([{salary:5}, {name:46}].stream().map(mapper).count()).toBe(2);
+		expect([{name:5}, {salary:46}].stream().map(mapper).sum()).toBe(46);
+		expect([{name:5}, {salary:46}].stream().map(mapper).head).toEqual(undefined);
+
+		expect(Stream.empty().map(mapper).isEmpty()).toBe(true);
+
+		var builder = {
+			counter: 0,
+			get: function() {
+				this.counter++;
+				return {
+					id: this.counter,
+					salary: 100 * this.counter
+				};
+			},
+			// Reset the builder to initial conditions so we can replay it
+			reset: function() {
+				this.counter = 0;
+			}
+		};
+
+		expect(Stream.generate(builder).limit(100).map(mapper).isEmpty()).toBe(false);
+		builder.reset();
+		expect(Stream.generate(builder).limit(100).map(mapper).count()).toBe(100);
+		builder.reset();
+		expect(Stream.generate(builder).limit(100).map(mapper).sum()).toBe(505000);
+		builder.reset();
+		expect(Stream.generate(builder).limit(100).map(mapper).average()).toBe(5050);
+	});
+
 	it('can be made into an array', function () {
 		expect([].stream().toArray()).toEqual([]);
 		expect(["1", 1 , "a", undefined, "basdf"].stream().toArray())
@@ -142,6 +188,25 @@ describe('A Stream', function () {
 		expect(Stream.range(-2, -1).toArray()).toEqual([-2, -1]);
 		expect(Stream.range(1, -1).toArray()).toEqual([]);
 		expect(Stream.range(1).limit(5).toArray()).toEqual([1, 2, 3, 4, 5]);
+	});
+
+	it('can skip elements', function () {
+		expect([].stream().skip(5).isEmpty()).toBe(true);
+		expect([undefined, NaN, null, {name:"bob"}].stream().skip(2).toArray()).toEqual([null, {name:"bob"}]);
+		expect([null, {name:"bob"}, undefined, NaN].stream().skip(2).toArray()).toEqual([undefined, NaN]);
+		expect([undefined, 1, 2].stream().skip(5).isEmpty()).toBe(true);
+		expect([undefined, 1, 2].stream().skip(5).toArray()).toEqual([]);
+		expect([undefined, 1, 2].stream().skip(0).toArray()).toEqual([undefined, 1, 2]);
+		expect([undefined, 1, 2].stream().skip(2).isEmpty()).toBe(false);
+		expect([undefined, 1, 2, "a"].stream().skip(2).toArray()).toEqual([2, "a"]);
+		expect([1, 2, undefined, "a"].stream().skip(2).toArray()).toEqual([undefined, "a"]);
+
+		expect(Stream.empty().skip(5).isEmpty()).toBe(true);
+		expect(Stream.empty().skip(0).toArray()).toEqual([]);
+		expect(Stream.range().skip(0).limit(5).toArray()).toEqual([1, 2, 3, 4, 5]);
+		expect(Stream.range().skip(-10).limit(5).toArray()).toEqual([1, 2, 3, 4, 5]);
+		expect(Stream.range().skip(5).limit(5).toArray()).toEqual([6, 7, 8, 9, 10]);
+		expect(Stream.range().skip(5).limit(5).sum()).toBe(40);
 	});
 
 	it('can sum the elements', function () {

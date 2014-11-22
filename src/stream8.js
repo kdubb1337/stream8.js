@@ -51,14 +51,14 @@
 			}
 
 			var head = this.head;
-			var tail = this.tail();
 
 			if(predicate(head)) {
+				var self = this;
 				return newOfSameType(this, head, function () {
-					return tail.filter(predicate);
+					return self.tail().filter(predicate);
 				});
 			}
-			return tail.filter(predicate);
+			return this.tail().filter(predicate);
 		},
 		/* Terminal */
 		forEach: function(consumer, defaultResult, curIndex) {
@@ -88,10 +88,20 @@
 			if(maxElements < 1 || this.isEmpty())
 				return Stream.empty();
 
-			var next = this.tail();
+			var self = this;
 			return newOfSameType(this, this.head, function() {
-				return next.limit(--maxElements);
-			})
+				return self.tail().limit(--maxElements);
+			});
+		},
+		map: function(mapper) {
+			if(this.isEmpty()) {
+				return Stream.empty();
+			}
+
+			var self = this;
+			return newOfSameType(this, mapper(this.head), function() {
+				return self.tail().map(mapper);
+			});
 		},
 		/* Terminal */
 		toArray: function() {
@@ -112,6 +122,23 @@
 			});
 
 			return result + "}]";
+	    },
+	    skip: function(num) {
+	    	var start = this;
+
+	    	for(var i = 0; i < num; i++) {
+	    		if(start.isEmpty()) {
+	    			return Stream.empty();
+	    		}
+
+	    		start = start.tail();
+	    	}
+
+	    	if(start.isEmpty()) {
+    			return Stream.empty();
+    		}
+
+	    	return newOfSameType(start, start.head, start.tail);
 	    },
 		sum: function() {
 			if(this.isEmpty())
