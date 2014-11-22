@@ -1,6 +1,6 @@
 {
   "name": "stream8",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Powerful Streams for Javascript",
   "scripts": {
     "test": "grunt test"
