@@ -42,6 +42,37 @@
 
 			return this.tail().count() + 1;
 		},
+		collect: function(collector) {
+			var result = {};
+
+			this.forEach(function(val) {
+				var key = collector(val);
+
+				// If this is the first value in the key
+				if(!result.hasOwnProperty(key)) {
+					result[key] = [];
+				}
+
+				// Add this value to the array for the key
+				result[key][result[key].length] = val;
+			});
+
+			return result;
+		},
+		collectFirst: function(collector) {
+			var result = {};
+
+			this.forEach(function(val) {
+				var key = collector(val);
+
+				// If this is the first value in the key
+				if(!result.hasOwnProperty(key)) {
+					result[key] = val;
+				}
+			});
+
+			return result;
+		},
 		isEmpty: function() {
 			return typeof this.head == 'undefined';
 		},

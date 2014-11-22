@@ -11,6 +11,68 @@ describe('A Stream', function () {
 		expect(Stream.range(0,1000).average()).toBe(500);
 	});
 
+	it('can be collected', function () {
+		var collector = function(val) {
+			if(val === undefined || val === null) {
+				return undefined;
+			}
+			return val.id;
+		};
+
+		expect([].stream().collect(collector)).toEqual({});
+		expect([undefined].stream().collect(collector))
+			.toEqual({
+				'undefined':[undefined]
+			});
+		expect([undefined, NaN, null, undefined].stream().collect(collector))
+			.toEqual({
+				'undefined':[undefined, NaN, null, undefined]
+			});
+
+		var people = [{id:1, name:"bob"},
+			{id:2, name:"joe"},
+			{name:"bob"},
+			{id:1, name:"jane"}]
+
+		expect(people.stream().collect(collector))
+			.toEqual({
+				'undefined':[{name:"bob"}],
+				'1':[{id:1, name:"bob"},{id:1, name:"jane"}],
+				'2':[{id:2, name:"joe"}]
+			});
+	});
+
+	it('can be collect to a map of the first values', function () {
+		var collector = function(val) {
+			if(val === undefined || val === null) {
+				return undefined;
+			}
+			return val.id;
+		};
+
+		expect([].stream().collectFirst(collector)).toEqual({});
+		expect([undefined].stream().collectFirst(collector))
+			.toEqual({
+				'undefined':undefined
+			});
+		expect([undefined, NaN, null, undefined].stream().collectFirst(collector))
+			.toEqual({
+				'undefined':undefined
+			});
+
+		var people = [{id:1, name:"bob"},
+			{id:2, name:"joe"},
+			{name:"bob"},
+			{id:1, name:"jane"}]
+
+		expect(people.stream().collectFirst(collector))
+			.toEqual({
+				'undefined':{name:"bob"},
+				'1':{id:1, name:"bob"},
+				'2':{id:2, name:"joe"}
+			});
+	});
+
 	it('can be counted', function () {
 		expect([].stream().count()).toBe(0);
 		expect([1].stream().count()).toBe(1);
