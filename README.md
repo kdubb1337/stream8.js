@@ -10,7 +10,7 @@ Stream8 is on bower with <code>"stream8": "~0.1.4"</code> or you can download th
 I love examples.
 
 Example1: Calculate the average salary of people in the HR deparement. <i>people</i> is an array of objects like this {department:"myDepartment",salary:52000}
-<pre><code>int averageSalary = people.stream()
+<pre><code>var averageSalary = people.stream()
 		.filter(function(val) {
 			return val.department == 'HR';
 		})
@@ -20,7 +20,7 @@ Example1: Calculate the average salary of people in the HR deparement. <i>people
 		.average()</code></pre>
 
 <h3>Background</h3>
-Arrays are great at storing data but not so great at performing computations. Stream8 offers a highly effiecient way to quickly perform operations on elements, re-organize into another array or calculate a value.
+Arrays are great at storing data but not so great at performing computations. Stream8 offers a highly efficient way to perform operations on elements, re-organize into another array or calculate a value.
 
 One key feature is the intermediate steps are done <i>lazily</i>. This means if I do something like this: <code>array.stream().filter(crazyLongFunction).limit(0).toArray()</code> that long running fuction will never be called and I'll immediately get an empty array back. You can think of a stream as a pipeline and each intermediate step will ask the previous step for a value only when it needs one. If you don't use Streams and instead use the built in array.filter (even if the browser supports array.filter!)... it'll happily call crazyLongFunction for every element in the array because the operations on the native array are performed <i>eagerly</i>.
 
