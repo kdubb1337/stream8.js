@@ -1,7 +1,7 @@
 {
   "name": "stream8",
   "description": "Supercharge your javascript with the awesomeness that is streams",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "keywords": [
     "js",
     "stream",
@@ -20,6 +20,7 @@
     "karma.conf.js",
     "package.json",
     "test/*.js"
+    "src"
   ],
   "dependencies": {
   }

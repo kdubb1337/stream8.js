@@ -3,6 +3,7 @@
 module.exports = function(grunt) {
 	// Load grunt tasks automatically
     require('load-grunt-tasks')(grunt);
+    grunt.loadNpmTasks('grunt-closure-compiler');
 
 	// Time how long tasks take. Can help when optimizing build times
     require('time-grunt')(grunt);
@@ -73,18 +74,42 @@ module.exports = function(grunt) {
                     }
                 }
             }
+        },
+
+        'closure-compiler': {
+            frontend: {
+                closurePath: 'C:/Dev/github/closure-compiler',
+                js: '<%= config.app %>/stream8.js',
+                jsOutputFile: '<%= config.dist %>/stream8.min.js',
+                maxBuffer: 500,
+                options: {
+                    compilation_level: 'SIMPLE_OPTIMIZATIONS',
+                    // compilation_level: 'ADVANCED_OPTIMIZATIONS',
+                    language_in: 'ECMASCRIPT5_STRICT'
+                }
+            }
+        },
+
+        // Copies remaining files to places other tasks can use
+        copy: {
+            dist: {
+                files: [{
+                    expand: true,
+                    dot: true,
+                    cwd: '<%= config.app %>',
+                    dest: '<%= config.dist %>',
+                    src: ["*.*", "**/*.*"]
+                }]
+            }
         }
     });
 
-	grunt.registerTask('serve', function(target) {
+	grunt.registerTask('build', function(target) {
         grunt.task.run([
-            'clean:server',
-            'injector',
-            'concurrent:server',
-            'less',
-            'autoprefixer',
-            'connect:livereload',
-            'watch'
+            'test',
+            'clean:dist',
+            'copy:dist',
+            'closure-compiler',
         ]);
     });
 

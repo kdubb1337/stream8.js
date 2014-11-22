@@ -4,7 +4,7 @@ stream8.js
 Streams are an efficient, functional way to reduce boilerplate code for common array manipulation tasks. You'll start coding less, coding quicker and have code which is not only easier to read, but less prone to errors.
 
 <h3>Installation</h3>
-Stream8 is on bower with <code>"stream8": "~0.1.2"</code> or you can download the source from the app folder and or the minified version from dist.
+Stream8 is on bower with <code>"stream8": "~0.1.3"</code> or you can download the source from the app folder and or the minified version from dist.
 
 <h3>What does it do?</h3>
 I love examples.
