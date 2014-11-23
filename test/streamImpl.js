@@ -13,9 +13,6 @@ describe('A Stream', function () {
 
 	it('can be collected', function () {
 		var collector = function(val) {
-			if(val === undefined || val === null) {
-				return undefined;
-			}
 			return val.id;
 		};
 
@@ -44,9 +41,6 @@ describe('A Stream', function () {
 
 	it('can be collect to a map of the first values', function () {
 		var collector = function(val) {
-			if(val === undefined || val === null) {
-				return undefined;
-			}
 			return val.id;
 		};
 
@@ -58,6 +52,14 @@ describe('A Stream', function () {
 		expect([undefined, NaN, null, undefined].stream().collectFirst(collector))
 			.toEqual({
 				'undefined':undefined
+			});
+		expect([NaN, undefined, null, undefined].stream().collectFirst(collector))
+			.toEqual({
+				'undefined':NaN
+			});
+		expect([null, undefined, NaN, undefined].stream().collectFirst(collector))
+			.toEqual({
+				'undefined':null
 			});
 
 		var people = [{id:1, name:"bob"},
@@ -126,12 +128,22 @@ describe('A Stream', function () {
 		expect(filtered.toArray()).toEqual(Stream.range(151, 250).toArray());
 	});
 
+	it('can return the first matching element', function () {
+		expect([].stream().findFirst()).toEqual(undefined);
+		expect(["a", 1, undefined].stream().findFirst()).toEqual("a");
+		expect([undefined, "a", 1].stream().findFirst()).toEqual(undefined);
+		expect([NaN, "a", 1].stream().findFirst()).toEqual(NaN);
+		expect([null, "a", 1].stream().findFirst()).toEqual(null);
+		expect([1, undefined, "a"].stream().findFirst()).toEqual(1);
+		expect([{name:"bob"}, "a"].stream().findFirst()).toEqual({name:"bob"});
+
+		expect(Stream.empty().findFirst()).toEqual(undefined);
+		expect(Stream.range().findFirst()).toEqual(1);
+	});
+
 	it('can be flattened', function () {
-		var people1 = [{ids:[1, 2, 3]}, undefined, {ids:[4, 5, 6]}];
+		var people1 = [{ids:[1, 2, 3]}, NaN, undefined, {ids:[4, 5, 6]}];
 		var flattener = function(val) {
-			if(val === undefined) {
-				return undefined;
-			}
 			return val.ids;
 		};
 
@@ -207,23 +219,23 @@ describe('A Stream', function () {
 
 	it('can map to a new stream', function() {
 		var mapper = function(val) {
-			if(val === undefined) {
-				return undefined;
-			}
 			return val.salary;
 		};
 
 		expect([].stream().map(mapper).count()).toBe(0);
 		expect([].stream().map(mapper).isEmpty()).toBe(true);
-		expect([undefined].stream().map(mapper).count()).toEqual(1);
-		expect([undefined].stream().map(mapper).isEmpty()).toBe(false);
+		expect([undefined].stream().map(mapper).count()).toEqual(0);
+		expect([undefined].stream().map(mapper).isEmpty()).toBe(true);
+		expect(["a", 1].stream().map(mapper).toArray())
+			.toEqual([undefined, undefined]);
 		expect([{salary:5}, {salary:46}].stream().map(mapper).count()).toBe(2);
 		expect([{salary:5}, {salary:46}].stream().map(mapper).sum()).toBe(51);
 		expect([{salary:5}, {salary:46}].stream().map(mapper).average()).toBe(25.5);
 
 		expect([{salary:5}, {name:46}].stream().map(mapper).count()).toBe(2);
 		expect([{name:5}, {salary:46}].stream().map(mapper).sum()).toBe(46);
-		expect([{name:5}, {salary:46}].stream().map(mapper).head).toEqual(undefined);
+		expect([{name:5}, {salary:46}].stream().map(mapper).head)
+			.toEqual(undefined);
 
 		expect(Stream.empty().map(mapper).isEmpty()).toBe(true);
 

@@ -17,9 +17,10 @@
 		return new ArrayStreamImpl(head, tail);
 	};
 
-	var isValidNumber = function(val) {
-		return typeof val == 'number' && !isNaN(val);
-	}
+	var isBadValue = function(val) {
+		return val === undefined || val === null ||
+			(typeof val == 'number' && isNaN(parseInt(val)));
+	};
 
 	StreamImpl.prototype = {
 		average: function() {
@@ -27,7 +28,7 @@
 			var total = 0;
 
 			this.forEach(function(val) {
-				if(isValidNumber(val)) {
+				if(!isNaN(val)) {
 					count++;
 					total += val;
 				}
@@ -46,7 +47,7 @@
 			var result = {};
 
 			this.forEach(function(val) {
-				var key = collector(val);
+				var key = isBadValue(val) ? undefined : collector(val);
 
 				// If this is the first value in the key
 				if(!result.hasOwnProperty(key)) {
@@ -63,7 +64,7 @@
 			var result = {};
 
 			this.forEach(function(val) {
-				var key = collector(val);
+				var key = isBadValue(val) ? undefined : collector(val);
 
 				// If this is the first value in the key
 				if(!result.hasOwnProperty(key)) {
@@ -83,7 +84,8 @@
 
 			var head = this.head;
 
-			if(predicate(head)) {
+			// prevent bad values passing through
+			if(!isBadValue(head) && predicate(head)) {
 				var self = this;
 				return newOfSameType(this, head, function () {
 					return self.tail().filter(predicate);
@@ -91,18 +93,19 @@
 			}
 			return this.tail().filter(predicate);
 		},
+		findFirst: function() {
+			return this.head;
+		},
 		flatMap: function(mapper) {
 			if(this.isEmpty()) {
 				return this;
 			}
 
-			var result = mapper(this.head);
-
-			if(result === undefined) {
+			if(isBadValue(this.head)) {
 				return this.tail().flatMap(mapper);
 			}
 
-			return Stream.concat(result.stream(), this.tail().flatMap(mapper));
+			return Stream.concat(mapper(this.head).stream(), this.tail().flatMap(mapper));
 		},
 		/* Terminal */
 		forEach: function(consumer, defaultResult, curIndex) {
@@ -140,6 +143,10 @@
 		map: function(mapper) {
 			if(this.isEmpty()) {
 				return this;
+			}
+
+			if(isBadValue(this.head)) {
+				return this.tail().map(mapper);
 			}
 
 			var self = this;
@@ -188,7 +195,7 @@
 			if(this.isEmpty())
 				return 0;
 
-			return isValidNumber(this.head) ? this.head + this.tail().sum() :
+			return !isNaN(this.head) ? this.head + this.tail().sum() :
 				this.tail().sum();
 		}
 	};
