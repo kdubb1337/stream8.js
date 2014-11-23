@@ -75,6 +75,54 @@ describe('A Stream', function () {
 			});
 	});
 
+	it('can check to see if an object is present', function () {
+		var complexObject = {
+			id:1,
+			names:["bob", "jane"]
+		};
+		var array = [undefined, NaN, null, ["a", "c"], 123, "a",
+			complexObject, [1, 2, 3]];
+
+		expect(array.stream().contains(undefined)).toBe(true);
+		expect(array.stream().contains(NaN)).toBe(true);
+		expect(array.stream().contains(null)).toBe(true);
+		expect(array.stream().contains(123)).toBe(true);
+		expect(array.stream().contains(122)).toBe(false);
+		expect(array.stream().contains(-123)).toBe(false);
+		expect(array.stream().contains("a")).toBe(true);
+		expect(array.stream().contains("aa")).toBe(false);
+		expect(array.stream().contains("b")).toBe(false);
+		expect(array.stream().contains([1, 2, 3])).toBe(true);
+		expect(array.stream().contains([1, 3, 2])).toBe(false);
+		expect(array.stream().contains([1, 2])).toBe(false);
+		expect(array.stream().contains(["a", "c"])).toBe(true);
+		expect(array.stream().contains(["c", "a"])).toBe(false);
+		expect(array.stream().contains(["a", "c", "b"])).toBe(false);
+		expect(array.stream().contains(["a"])).toBe(false);
+		expect(array.stream().contains({})).toBe(false);
+		expect(array.stream().contains({id:1})).toBe(false);
+		expect(array.stream().contains({id:2,names:["bob", "jane"]})).toBe(false);
+		expect(array.stream().contains({id:1,names:undefined})).toBe(false);
+		expect(array.stream().contains({id:1,names:[]})).toBe(false);
+		expect(array.stream().contains({id:1,names:["bob"]})).toBe(false);
+		expect(array.stream().contains({id:1,names:["jane", "bob"]})).toBe(false);
+		expect(array.stream().contains({names:["bob", "jane"]})).toBe(false);
+		expect(array.stream().contains({id:1,names:["bob", "jane"],email:"ddd"})).toBe(false);
+		expect(array.stream().contains({id:1,names:["bob", "jane"]})).toBe(true);
+
+		expect(Stream.empty().contains(undefined)).toBe(false);
+		expect(Stream.empty().contains(1)).toBe(false);
+		expect(Stream.empty().contains("a")).toBe(false);
+		expect(Stream.range(0, 10).contains(0)).toBe(true);
+		expect(Stream.range(0, 10).contains(1)).toBe(true);
+		expect(Stream.range(0, 10).contains(10)).toBe(true);
+		expect(Stream.range(0, 10).contains(-1)).toBe(false);
+		expect(Stream.range(0, 10).contains(11)).toBe(false);
+		expect(Stream.range(0, 10).contains("a")).toBe(false);
+		expect(Stream.range(0, 10).contains([1])).toBe(false);
+		expect(Stream.range(0, 10).contains({id:1})).toBe(false);
+	});
+
 	it('can be counted', function () {
 		expect([].stream().count()).toBe(0);
 		expect([1].stream().count()).toBe(1);

@@ -18,8 +18,83 @@
 	};
 
 	var isBadValue = function(val) {
-		return val === undefined || val === null ||
-			(typeof val == 'number' && isNaN(parseInt(val)));
+		return val === undefined || val === null || isReallyNaN(val);
+	};
+
+	var isReallyNaN = function(val) {
+		return typeof val == 'number' && isNaN(parseInt(val));
+	};
+
+	// Deep equality check
+	var equals = function(a, b) {
+		if(a === b) {
+			return true;
+		}
+
+		if(a === undefined || b === undefined || a === null || b === null) {
+			return false;
+		}
+
+		var typeofA = typeof a;
+
+		if(typeofA !== typeof b) {
+			return false;
+		}
+
+		var isAReallyNaN = isReallyNaN(a);
+		var isBReallyNaN = isReallyNaN(b);
+
+		if(isAReallyNaN && isBReallyNaN) {
+			return true;
+		}
+		else if (isAReallyNaN || isBReallyNaN) {
+			return false;
+		}
+
+		/* We won't check functions, and if it is a number or string it doesn't 
+			match if it made it this far down */
+		if(typeofA === 'string' || typeofA === 'number' || typeofA === 'function') {
+			return false;
+		}
+
+		var aIsArray = Array.isArray(a);
+
+		if(aIsArray && Array.isArray(b)) {
+			if(a.length !== b.length) {
+				return false;
+			}
+
+			for(var i = 0; i < a.length; i++) {
+				if (!equals(a[i], b[i])) {
+					return false;
+				}
+			}
+
+			return true;
+		}
+		else if(aIsArray) {
+			return false;
+		}
+		// Both objects
+		else {
+			var keys = Object.keys(a);
+
+			if(keys.length !== Object.keys(b).length) {
+				return false;
+			}
+
+			for(var i = 0; i < keys.length; i++) {
+				var key = keys[i];
+
+				if (!equals(a[key], b[key])) {
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		return false;
 	};
 
 	StreamImpl.prototype = {
@@ -35,13 +110,6 @@
 			});
 
 			return count === 0 ? 0 : total / count;
-		},
-		count: function() {
-			if(this.isEmpty()) {
-				return 0;
-			}
-
-			return this.tail().count() + 1;
 		},
 		collect: function(collector) {
 			var result = {};
@@ -73,6 +141,25 @@
 			});
 
 			return result;
+		},
+		contains: function(obj) {
+			return this.forEach(function(val) {
+				if(equals(obj, val)) {
+					return true;
+				}
+			}, false);
+		},
+		count: function() {
+			if(this.isEmpty()) {
+				return 0;
+			}
+
+			return this.tail().count() + 1;
+		},
+		distinct: function() {
+			var curObjects = [];
+			
+
 		},
 		isEmpty: function() {
 			return typeof this.head == 'undefined';
