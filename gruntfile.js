@@ -12,6 +12,7 @@ module.exports = function(grunt) {
     var config = {
         app: 'src',
         dist: 'dist',
+        test: 'test',
         port: "9000"
     };
 
@@ -98,7 +99,7 @@ module.exports = function(grunt) {
                     dot: true,
                     cwd: '<%= config.app %>',
                     dest: '<%= config.dist %>',
-                    src: ["*.*", "**/*.*"]
+                    src: ["stream8.js"]
                 }]
             }
         }

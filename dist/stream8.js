@@ -91,6 +91,19 @@
 			}
 			return this.tail().filter(predicate);
 		},
+		flatMap: function(mapper) {
+			if(this.isEmpty()) {
+				return this;
+			}
+
+			var result = mapper(this.head);
+
+			if(result === undefined) {
+				return this.tail().flatMap(mapper);
+			}
+
+			return Stream.concat(result.stream(), this.tail().flatMap(mapper));
+		},
 		/* Terminal */
 		forEach: function(consumer, defaultResult, curIndex) {
 			if(curIndex === undefined) {
@@ -126,7 +139,7 @@
 		},
 		map: function(mapper) {
 			if(this.isEmpty()) {
-				return Stream.empty();
+				return this;
 			}
 
 			var self = this;
@@ -193,6 +206,15 @@
 	ArrayStreamImpl.prototype.isEmpty = function() {return false;}
 
 	var Stream = {
+		concat: function(streamA, streamB) {
+			if(streamA.isEmpty()) {
+				return streamB;
+			}
+
+			return newOfSameType(streamA, streamA.head, function() {
+				return Stream.concat(streamA.tail(), streamB);
+			});
+		},
 		empty: function() {
 			return new StreamImpl();
 		},

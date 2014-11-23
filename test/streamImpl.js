@@ -126,6 +126,19 @@ describe('A Stream', function () {
 		expect(filtered.toArray()).toEqual(Stream.range(151, 250).toArray());
 	});
 
+	it('can be flattened', function () {
+		var people1 = [{ids:[1, 2, 3]}, undefined, {ids:[4, 5, 6]}];
+		var flattener = function(val) {
+			if(val === undefined) {
+				return undefined;
+			}
+			return val.ids;
+		};
+
+		expect(people1.stream().flatMap(flattener).toArray())
+			.toEqual([1, 2, 3, 4, 5, 6]);
+	});
+
 	it('can run a function for each element', function () {
 		var counter = 0;
 		var lastElement;

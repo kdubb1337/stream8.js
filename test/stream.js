@@ -1,4 +1,20 @@
 describe('Stream factory', function () {
+	it('can concatenate two streams', function () {
+		expect(Stream.concat([].stream(), [].stream()).toArray()).toEqual([]);
+		expect(Stream.concat([1].stream(), [].stream()).toArray()).toEqual([1]);
+		expect(Stream.concat([].stream(), [1].stream()).toArray()).toEqual([1]);
+		expect(Stream.concat([1, 2, 3].stream(), [4, 5, 6].stream()).toArray())
+			.toEqual([1, 2, 3, 4, 5, 6]);
+		expect(Stream.concat(["a", undefined].stream(), [1, NaN, null].stream()).toArray())
+			.toEqual(["a", undefined, 1, NaN, null]);
+
+		expect(Stream.concat(Stream.empty(), Stream.empty()).toArray()).toEqual([]);
+		expect(Stream.concat(Stream.range(1, 3), Stream.empty()).toArray()).toEqual([1, 2, 3]);
+		expect(Stream.concat(Stream.empty(), Stream.range(1, 3)).toArray()).toEqual([1, 2, 3]);
+		expect(Stream.concat(Stream.range(1, 3), Stream.range(4, 6)).toArray())
+			.toEqual([1, 2, 3, 4, 5, 6]);
+	});
+
 	it('can create an empty stream', function () {
 		expect(Stream.empty().isEmpty()).toBe(true);
 		expect(Stream.empty().head).toEqual(undefined);
