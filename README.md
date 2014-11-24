@@ -15,14 +15,15 @@ Example 1: Calculate the average salary of people in the HR deparement. <i>peopl
 		.map(function(val) { return val.salary; })
 		.average();</code></pre>
 
-Example 2: A common scenario is you may get some data via REST and you want to organize it so you can more quickly look up an object by a value. In this example I want to organize an array of things based on their IDs. things is an array of the following: [{id:23, name:'bob'}, {id:45, name:'jane'}]
+Example 2: A common scenario is you may get some data via REST and you want to organize it so you can more quickly look up an object by a value. In this example I want to organize an array of things based on their IDs. things is an array of the following: [{id:23, name:'bob'}, {id:45, name:'jane'}, ...]
 <pre><code>var thingMap = things.stream()
 		.collectFirst(function(val) { return val.id;};</code></pre>
 
 Result:
 <pre><code>{
 	23: {id:23, name:'bob'},
-	45: {id:45, name:'jane'}
+	45: {id:45, name:'jane'},
+	...
 }</code></pre>
 
 With this map I can call thingMap[id] and get back the thing with that id. This approach reduces repetitively looping through a large array everytime I want to find a value.
