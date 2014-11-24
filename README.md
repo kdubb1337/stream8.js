@@ -12,7 +12,7 @@ I love examples.
 Example 1: Calculate the average salary of people in the HR deparement. <i>people</i> is an array of objects like this {department:"myDepartment",salary:52000}
 <pre><code>var averageSalary = people.stream()
 		.filter(function(val) { return val.department == 'HR'; }) // Find only people from HR
-		.map(function(val) { return val.salary; }) // Turn the stream into their salaries instead of the full object
+		.map(function(val) { return val.salary; }) // Turn the stream into their salaries
 		.average(); // Average the salaries</code></pre>
 
 Example 2: A common scenario is you may get some data via REST and you want to organize it so you can more quickly look up an object by a value. In this example I want to organize an array of things based on their IDs. things is an array of the following: [{id:23, name:'bob'}, {id:45, name:'jane'}, ...]
