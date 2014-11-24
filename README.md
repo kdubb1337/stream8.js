@@ -11,21 +11,21 @@ I love examples.
 
 Example 1: Calculate the average salary of people in the HR deparement. <i>people</i> is an array of objects like this {department:"myDepartment",salary:52000}
 <pre><code>var averageSalary = people.stream()
-		.filter(function(val) {
-			return val.department == 'HR';
-		})
-		.map(function(val) {
-			return val.salary;
-		})
+		.filter(function(val) { return val.department == 'HR'; })
+		.map(function(val) { return val.salary; })
 		.average();</code></pre>
 
-Example 2: A common scenario is you may get some data via REST and you want to organize it so you can more quickly look up an object by a value. In this example I want to organize an array of things based on their IDs. things look like this {id: 1, ...}
+Example 2: A common scenario is you may get some data via REST and you want to organize it so you can more quickly look up an object by a value. In this example I want to organize an array of things based on their IDs. things is an array of the following: [{id:23, name:'bob'}, {id:45, name:'jane'}]
 <pre><code>var thingMap = things.stream()
-		.collectFirst(function(val) {
-			return val.id;
-		};</code></pre>
+		.collectFirst(function(val) { return val.id;};</code></pre>
 
-The result is a map where I can call thingMap[idIWant] and get back the thing with that id. This approach reduces repetitively looping through a large array everytime I want to find a value.
+Result:
+<pre><code>{
+	23: {id:23, name:'bob'},
+	45: {id:45, name:'jane'}
+}</code></pre>
+
+With this map I can call thingMap[id] and get back the thing with that id. This approach reduces repetitively looping through a large array everytime I want to find a value.
 
 <h3>Background</h3>
 Arrays are great at storing data but not so great at performing computations. Stream8 offers a highly efficient way to perform operations on elements, re-organize into another array or calculate a value.
