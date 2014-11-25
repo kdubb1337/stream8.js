@@ -1,7 +1,7 @@
 {
   "name": "stream8",
   "description": "Supercharge your javascript with the awesomeness that is streams",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "keywords": [
     "js",
     "stream",
@@ -10,7 +10,7 @@
   ],
   "homepage": "https://github.com/kdubb1337/stream8.js",
   "main": [
-    "src/stream8.js"
+    "dist/stream8.js"
   ],
   "ignore": [
     ".bower.json",

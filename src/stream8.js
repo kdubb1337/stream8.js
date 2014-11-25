@@ -97,6 +97,20 @@
 		return false;
 	};
 
+	var innerDistinct = function(stream, previousValues) {
+		if(stream.isEmpty()) {
+			return stream;
+		}
+
+		if(!previousValues.stream().contains(stream.head)) {
+			previousValues[previousValues.length] = stream.head;
+			return newOfSameType(stream, stream.head, function () {
+				return innerDistinct(stream.tail(), previousValues);
+			});
+		}
+		return innerDistinct(stream.tail(), previousValues);
+	};
+
 	StreamImpl.prototype = {
 		average: function() {
 			var count = 0;
@@ -157,9 +171,7 @@
 			return this.tail().count() + 1;
 		},
 		distinct: function() {
-			var curObjects = [];
-			
-
+			return innerDistinct(this, []);
 		},
 		isEmpty: function() {
 			return typeof this.head == 'undefined';

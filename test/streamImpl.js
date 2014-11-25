@@ -132,6 +132,32 @@ describe('A Stream', function () {
 		expect([undefined, undefined, NaN, NaN, null].stream().count()).toBe(5);
 	});
 
+	it('can allow for only distinct values', function () {
+		expect([].stream().distinct().count()).toBe(0);
+		expect(["a"].stream().distinct().toArray()).toEqual(["a"]);
+		expect(["a", "b", "a"].stream().distinct().toArray()).toEqual(["a", "b"]);
+		expect(["a", "a", "b"].stream().distinct().toArray()).toEqual(["a", "b"]);
+		expect([1, "a", 1, "b", "a"].stream().distinct().toArray()).toEqual([1, "a", "b"]);
+		expect(["a", undefined, undefined, "b"].stream().distinct().toArray())
+			.toEqual(["a", undefined, "b"]);
+		expect(["a", NaN, NaN, "b"].stream().distinct().toArray())
+			.toEqual(["a", NaN, "b"]);
+		expect(["a", null, null, "b"].stream().distinct().toArray())
+			.toEqual(["a", null, "b"]);
+		expect([{}, {}].stream().distinct().toArray())
+			.toEqual([{}]);
+		expect([{id:1}, {id:2}].stream().distinct().toArray())
+			.toEqual([{id:1}, {id:2}]);
+		expect([{id:1}, {id:1}].stream().distinct().toArray())
+			.toEqual([{id:1}]);
+		expect([{id:1}, {ids:1}].stream().distinct().toArray())
+			.toEqual([{id:1}, {ids:1}]);
+		expect([{id:1, names:["a", 1]}, {id:1, names:["a", 1]}].stream().distinct().toArray())
+			.toEqual([{id:1, names:["a", 1]}]);
+		expect([{id:1, names:["a", 1]}, {id:1, names:["a", 2]}].stream().distinct().toArray())
+			.toEqual([{id:1, names:["a", 1]}, {id:1, names:["a", 2]}]);
+	});
+
 	it('can be empty', function () {
 		expect([undefined].stream().isEmpty()).toBe(false);
 		expect([undefined].stream().tail().isEmpty()).toBe(true);
